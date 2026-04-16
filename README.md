@@ -48,7 +48,7 @@ npm run dev
 - 🔒 Loading skeletons & error boundaries
 - 🔒 Template mode switching (service ↔ shopping)
 
-** [Upgrade to Premium](https://luxeride.in)** to unlock all features.
+[Upgrade to Premium](https://luxeride.in) to unlock all features.
 
 ---
 
