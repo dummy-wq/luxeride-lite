@@ -1,7 +1,7 @@
 {
   "name": "luxeride-lite",
   "version": "0.1.0",
-  "description": "LuxeRide Lite - Free Catalog Demo. Upgrade to Premium for full features.",
+  "description": "LuxeRide Lite - Free Catalog Demo.",
   "private": true,
   "scripts": {
     "dev": "next dev",

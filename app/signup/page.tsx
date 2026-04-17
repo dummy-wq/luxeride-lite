@@ -43,7 +43,7 @@ export default function SignupPage() {
             Create Account
           </h1>
           <p className="text-sm text-muted-foreground">
-            Join {siteConfig.brand.name} to book premium vehicles
+            Join {siteConfig.brand.name} to explore our luxury collection
           </p>
         </div>
 

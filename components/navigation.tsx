@@ -4,7 +4,7 @@ import { useState, useEffect } from "react";
 import { usePathname } from "next/navigation";
 import Link from "next/link";
 import { useTheme } from "next-themes";
-import { Moon, Sun, Menu, X, User } from "lucide-react";
+import { Moon, Sun, Menu, X, User, ShoppingCart } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
@@ -127,6 +127,17 @@ export function Navigation() {
               ) : (
                 <Moon className="w-5 h-5" />
               )}
+            </Button>
+            <Button
+              variant="ghost"
+              size="icon"
+              className="text-foreground"
+              title="Cart"
+              asChild
+            >
+              <Link href="/cart">
+                <ShoppingCart className="w-5 h-5" />
+              </Link>
             </Button>
             {user ? (
               <>

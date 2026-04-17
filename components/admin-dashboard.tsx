@@ -39,7 +39,6 @@ import { siteConfig } from "@/template/config";
 import { FleetManager } from "@/components/fleet-manager";
 
 // ─── Lite: No theme wizard, no scripts ──────────────────────────────────────
-// Upgrade to Premium for theme customisation and template settings.
 
 export function AdminDashboard() {
     const { toast } = useToast();

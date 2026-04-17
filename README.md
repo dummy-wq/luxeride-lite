@@ -33,22 +33,7 @@ npm run dev
 - ✅ Responsive design
 - ✅ Docker support
 
-## What's in Premium
-
-- 🔒 Booking & payment system (Razorpay)
-- 🔒 Shopping cart & checkout
-- 🔒 Email notifications
-- 🔒 Reviews & ratings
-- 🔒 Wishlist
-- 🔒 Theme customisation (edit colours from TypeScript)
-- 🔒 Admin analytics dashboard
-- 🔒 White-labeling & re-branding guide
-- 🔒 SEO (sitemap, robots.txt, OpenGraph)
-- 🔒 Edge auth middleware (JWT verification)
-- 🔒 Loading skeletons & error boundaries
-- 🔒 Template mode switching (service ↔ shopping)
-
-[Upgrade to Premium](https://luxeride.in) to unlock all features.
+---
 
 ---
 
@@ -65,7 +50,6 @@ ADMIN_PASSWORD=admin123
 
 ## License
 
-This Lite version is free for personal and commercial use.  
-The Premium version is sold under a Commercial Single-Use License.
+This project is free for personal and commercial use.
 
 *Built with ❤️ using Next.js, TypeScript, and MongoDB.*

@@ -327,7 +327,7 @@ export function FleetManager() {
                                         defaultValue={editingItem?.name}
                                         required
                                         className="w-full px-4 py-2 bg-input border border-border rounded-lg"
-                                        placeholder={`e.g. Premium ${taxonomy.itemLabelSingular}`}
+                                        placeholder={`e.g. Luxury ${taxonomy.itemLabelSingular}`}
                                     />
                                 </div>
                                 <div className="space-y-2">
@@ -339,7 +339,7 @@ export function FleetManager() {
                                         defaultValue={editingItem?.category}
                                         required
                                         className="w-full px-4 py-2 bg-input border border-border rounded-lg"
-                                        placeholder="e.g. Premium, Standard, Budget"
+                                        placeholder="e.g. Luxury, Standard, Economy"
                                     />
                                 </div>
                                 <div className="space-y-2">

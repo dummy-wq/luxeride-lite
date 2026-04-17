@@ -2,7 +2,6 @@
  * Site Configuration — LuxeRide Lite
  * ====================================
  * Edit this file to rebrand and customise copy.
- * For full theme customisation, upgrade to LuxeRide Premium.
  */
 
 export const siteConfig = {
@@ -11,8 +10,8 @@ export const siteConfig = {
     name: "LuxeRide",
     customLogo: null,
     logoLetter: "L",
-    tagline: "Premium Car Rentals in India",
-    description: "Experience luxury car rentals with premium vehicles across India",
+    tagline: "Luxury Car Rentals in India",
+    description: "Experience luxury car rentals with top-tier vehicles across India",
     phone: "+91 800-LUXERIDE",
     email: "support@luxeride.in",
     foundedYear: 2020,
@@ -26,7 +25,7 @@ export const siteConfig = {
 
   // ── Template (locked to catalog-only in Lite) ──────────
   template: {
-    mode: "service" as "service" | "shopping",
+    mode: "shopping" as "service" | "shopping",
     showAvailability: false,
     enableBooking: false,  // Disabled in Lite — catalog browse only
     quantity: {
@@ -45,7 +44,7 @@ export const siteConfig = {
     addToCartLabel: "Add to Cart",
     priceSuffix: "/hr",
     catalogHeading: "Our Fleet",
-    catalogSubheading: "Handpicked premium vehicles for your next journey.",
+    catalogSubheading: "Handpicked luxury vehicles for your next journey.",
     reservationRequiredLabel: "Reservation Required",
     ordersLabel: "Bookings",
     cartLabel: "Cart",
@@ -70,25 +69,25 @@ export const siteConfig = {
 
   // ── Hero Section ───────────────────────────────────────
   hero: {
-    badge: "Premium Experience Awaits",
+    badge: "Luxury Experience Awaits",
     headingLine1: "ELEVATE",
     headingLine2: "YOUR DRIVE",
     subheading:
-      "Curating the world's most exclusive premium experiences. Luxury is no longer a choice, it's a standard.",
+      "Curating the world's most exclusive luxury experiences. Luxury is no longer a choice, it's a standard.",
     ctaLabel: "Explore Catalog",
     stats: [
       { value: "500+", label: "Items" },
       { value: "24/7", label: "Support" },
-      { value: "Premium", label: "Quality" },
+      { value: "High-end", label: "Quality" },
     ],
-    darkImage: "/hero-dark-premium.jpg",
-    lightImage: "/hero-light-premium.png",
+    darkImage: "/hero-dark-luxury.jpg",
+    lightImage: "/hero-light-luxury.png",
   },
 
   // ── Cars Page (Catalog) ────────────────────────────────
   carsPage: {
     heading: "Our Collection",
-    subheading: "Browse through our handpicked selection of premium items.",
+    subheading: "Browse through our handpicked selection of luxury items.",
     categories: [
       { id: "all", label: "All Items" },
       { id: "SUV", label: "SUV" },
@@ -110,17 +109,17 @@ export const siteConfig = {
     badge: "About LuxeRide",
     heading: "Luxury Car Rentals Reimagined",
     intro:
-      "Since 2020, LuxeRide has been transforming the luxury car rental experience in India. We believe everyone deserves to experience the thrill of driving a premium vehicle.",
+      "Since 2020, LuxeRide has been transforming the luxury car rental experience in India. We believe everyone deserves to experience the thrill of driving a luxury vehicle.",
     story: [
       "LuxeRide was founded with a simple vision: to make luxury car rentals accessible, transparent, and hassle-free for everyone.",
-      "Today, we operate across 50+ cities in India with a fleet of over 500 premium vehicles.",
+      "Today, we operate across 50+ cities in India with a fleet of over 500 handpicked vehicles.",
       "Our commitment remains unchanged: provide the best luxury rental experience with unmatched customer service.",
     ],
     values: [
       { icon: "Zap", title: "Innovation", description: "Cutting-edge technology for seamless booking and vehicle management" },
       { icon: "Shield", title: "Safety First", description: "Rigorous maintenance and comprehensive insurance coverage" },
       { icon: "Users", title: "Customer Focus", description: "24/7 support and personalized service for every rental" },
-      { icon: "Award", title: "Excellence", description: "Premium fleet of luxury vehicles with exceptional quality" },
+      { icon: "Award", title: "Excellence", description: "Luxury fleet of vehicles with exceptional quality" },
     ],
     team: [
       { name: "Rajesh Kumar", role: "Founder & CEO", initials: "RK" },
@@ -130,7 +129,7 @@ export const siteConfig = {
     ],
     stats: [
       { value: "4+", label: "Years of Excellence" },
-      { value: "500+", label: "Premium Vehicles" },
+      { value: "500+", label: "Luxury Vehicles" },
       { value: "10K+", label: "Happy Customers" },
       { value: "50+", label: "Cities Served" },
     ],

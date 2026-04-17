@@ -420,7 +420,7 @@ export function CarsShowcase() {
                   {/* Features */}
                   <Card className="p-6 bg-card border-border space-y-4">
                     <h3 className="text-xl font-bold text-foreground">
-                      Premium Features
+                      Key Features
                     </h3>
                     <div className="grid grid-cols-2 gap-3">
                       {selectedCar.features?.map(

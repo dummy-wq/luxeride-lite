@@ -295,7 +295,7 @@ export const carsDatabase = {
             "Leather Upholstery",
             "Panoramic Sunroof",
             "Adaptive Suspension",
-            "Premium Sound System",
+            "Luxury Sound System",
             "Advanced Driver Assistance",
             "Wireless Charging",
             "Ambient Lighting",
@@ -408,7 +408,7 @@ export const carsDatabase = {
         acceleration: "7.1 seconds (0-100 km/h)",
         topSpeed: "230 km/h",
         features: [
-            "Premium Leather",
+            "Luxury Leather",
             "Panoramic Sunroof",
             "Air Suspension",
             "Meridian Surround Sound",
@@ -437,10 +437,10 @@ export const carsDatabase = {
         acceleration: "3.2 seconds (0-100 km/h)",
         topSpeed: "250 km/h",
         features: [
-            "Premium Interior",
+            "Luxury Interior",
             "Panoramic Glass Roof",
             "Air Suspension",
-            " Premium Audio",
+            " High-end Audio",
             "Autopilot",
             "Power Seats",
             "Ambient Lighting",
@@ -498,7 +498,7 @@ export const carsDatabase = {
             "Vegan Leather Seats",
             "Curved Display",
             "Augmented Reality HUD",
-            "Meridian Premium Sound",
+            "Meridian Luxury Sound",
             "Remote Smart Park",
             "V2L (Vehicle-to-Load)",
             "Ambient Light",
@@ -524,7 +524,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -548,7 +548,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -572,7 +572,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -596,7 +596,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -620,7 +620,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -644,7 +644,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -668,7 +668,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -692,7 +692,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -716,7 +716,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -740,7 +740,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -764,7 +764,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -788,7 +788,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],
@@ -812,7 +812,7 @@ export const carsDatabase = {
         acceleration: "N/A",
         topSpeed: "N/A",
         features: [
-            "Premium Upholstery",
+            "Luxury Upholstery",
             "Advanced Infotainment",
             "Safety Package"
         ],

@@ -27,7 +27,8 @@ import {
   CreditCard,
   User,
   Activity,
-  Award
+  Award,
+  ShoppingCart
 } from "lucide-react";
 
 // Icon mapping for dynamic specs
@@ -171,7 +172,7 @@ export default function CarDetailPage() {
               {/* Features */}
               <Card className="p-6 bg-card border-border space-y-4">
                 <h3 className="text-xl font-bold text-foreground">
-                  Premium Features
+                  Key Features
                 </h3>
                 <div className="grid grid-cols-2 gap-3">
                   {car.features?.map((feature: string, index: number) => (
@@ -247,32 +248,33 @@ export default function CarDetailPage() {
                     <p>✓ {siteConfig.booking.insurance}</p>
                   </div>
 
-                  {/* Contact CTA */}
-                  <Button
-                    asChild
-                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg"
-                  >
-                    <Link href={`mailto:${siteConfig.brand.email}?subject=Inquiry about ${car.name}`}>
-                      Contact for Booking
-                    </Link>
-                  </Button>
+                  {/* Action CTA */}
+                  {siteConfig.template.mode === "shopping" ? (
+                    <Button
+                      asChild
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg gap-2"
+                    >
+                      <Link href="/cart">
+                        <ShoppingCart className="w-5 h-5" />
+                        {siteConfig.taxonomy.addToCartLabel}
+                      </Link>
+                    </Button>
+                  ) : (
+                    <Button
+                      asChild
+                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg"
+                    >
+                      <Link href={`mailto:${siteConfig.brand.email}?subject=Inquiry about ${car.name}`}>
+                        Contact for Booking
+                      </Link>
+                    </Button>
+                  )}
 
                   <p className="text-xs text-muted-foreground text-center">
                     Call us at {siteConfig.brand.phone}
                   </p>
                 </Card>
 
-                {/* Upgrade Banner */}
-                <Card className="p-5 bg-primary/5 border border-primary/20 rounded-2xl space-y-3">
-                  <div className="flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-primary" />
-                    <p className="text-sm font-bold text-foreground">Want online booking?</p>
-                  </div>
-                  <p className="text-xs text-muted-foreground leading-relaxed">
-                    Upgrade to <span className="font-bold text-foreground">LuxeRide Premium</span> to unlock online booking,
-                    payments, shopping cart, theme customisation, and more.
-                  </p>
-                </Card>
               </div>
             </div>
           </div>
