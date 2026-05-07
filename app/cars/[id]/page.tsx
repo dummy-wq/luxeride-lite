@@ -28,7 +28,9 @@ import {
   User,
   Activity,
   Award,
-  ShoppingCart
+  ShoppingCart,
+  CheckCircle,
+  Package,
 } from "lucide-react";
 
 // Icon mapping for dynamic specs
@@ -37,10 +39,12 @@ const IconMap: Record<string, any> = {
   Settings, Info, Layers, ShoppingBag, Calendar, Box, Truck,
   CreditCard, User, Activity, Award
 };
-import Image from "next/image";
+import { Skeleton } from "@/components/ui/skeleton";
 import Link from "next/link";
 
 import { carsDatabase } from "@/template/catalog";
+import { useCart } from "@/lib/context/cart-context";
+import { useToast } from "@/hooks/use-toast";
 
 export default function CarDetailPage() {
   const router = useRouter();
@@ -69,6 +73,16 @@ export default function CarDetailPage() {
     }
   }, [id, staticCar]);
 
+  const { addItem, isInCart, getQuantity, updateQuantity } = useCart();
+  const quantityCfg = siteConfig.template.quantity;
+  const [selectedQty, setSelectedQty] = useState<number>(quantityCfg.default);
+  const { toast } = useToast();
+  const [cartAdded, setCartAdded] = useState(false);
+
+  useEffect(() => {
+    if (isInCart(id)) setCartAdded(true);
+  }, [id, isInCart]);
+
   return (
     <main className="min-h-screen bg-background">
       <Navigation />
@@ -86,15 +100,17 @@ export default function CarDetailPage() {
           <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
             {/* Main Content */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Hero Image */}
-              <Card className="h-96 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl border-border overflow-hidden relative">
-                <Image
-                  src={car.image}
-                  alt={car.name}
-                  fill
-                  className={`object-cover ${car.name === "Jaguar XE" ? "scale-x-[-1]" : ""}`}
-                  priority
-                />
+              {/* Product Image */}
+              <Card className="h-96 bg-muted rounded-2xl border-border overflow-hidden relative">
+                {car.image ? (
+                  <img
+                    src={car.image}
+                    alt={car.name}
+                    className="w-full h-full object-cover object-center"
+                  />
+                ) : (
+                  <Skeleton className="absolute inset-0 w-full h-full" style={{ animationDuration: "8s" }} />
+                )}
               </Card>
 
               {/* Title and Category */}
@@ -128,44 +144,22 @@ export default function CarDetailPage() {
                 })}
               </div>
 
-              {/* Performance Specs */}
+              {/* Product Details */}
               <Card className="p-6 bg-card border-border space-y-4">
-                <h3 className="text-xl font-bold text-foreground">
-                  Performance
-                </h3>
+                <h3 className="text-xl font-bold text-foreground">Product Details</h3>
                 <div className="grid grid-cols-2 gap-6">
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Engine</p>
-                    <p className="font-semibold text-foreground">
-                      {car.engine || "N/A"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Power</p>
-                    <p className="font-semibold text-foreground">{car.power || "N/A"}</p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">Torque</p>
-                    <p className="font-semibold text-foreground">
-                      {car.torque || "N/A"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      0-100 km/h
-                    </p>
-                    <p className="font-semibold text-foreground">
-                      {car.acceleration || "N/A"}
-                    </p>
-                  </div>
-                  <div>
-                    <p className="text-sm text-muted-foreground mb-1">
-                      Top Speed
-                    </p>
-                    <p className="font-semibold text-foreground">
-                      {car.topSpeed || "N/A"}
-                    </p>
-                  </div>
+                  {siteConfig.metadataSchema.map((spec) => {
+                    const IconComp = IconMap[spec.icon] || Info;
+                    return (
+                      <div key={spec.key}>
+                        <div className="flex items-center gap-1.5 mb-1">
+                          <IconComp className="w-3.5 h-3.5 text-primary" />
+                          <p className="text-sm text-muted-foreground">{spec.label}</p>
+                        </div>
+                        <p className="font-semibold text-foreground">{car[spec.key] || "N/A"}</p>
+                      </div>
+                    );
+                  })}
                 </div>
               </Card>
 
@@ -186,27 +180,23 @@ export default function CarDetailPage() {
 
               {/* Policies */}
               <Card className="p-6 bg-card border-border space-y-4">
-                <h3 className="text-xl font-bold text-foreground">
-                  {siteConfig.taxonomy.itemLabelSingular} Policies
-                </h3>
+                <h3 className="text-xl font-bold text-foreground">Purchase Assurance</h3>
                 <div className="space-y-3">
                   <div className="flex gap-3 items-start">
                     <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <p className="font-semibold text-foreground">Insurance</p>
+                      <p className="font-semibold text-foreground">Warranty</p>
                       <p className="text-sm text-muted-foreground">
-                        {car.insurance || "Standard Coverage"}
+                        {car.warranty || "5 Years International Warranty"}
                       </p>
                     </div>
                   </div>
                   <div className="flex gap-3 items-start">
-                    <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
+                    <Package className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
                     <div>
-                      <p className="font-semibold text-foreground">
-                        Cancellation
-                      </p>
+                      <p className="font-semibold text-foreground">Delivery</p>
                       <p className="text-sm text-muted-foreground">
-                        {car.cancellation || "Free within 24h"}
+                        {car.shipping || "Free Insured Global Delivery"}
                       </p>
                     </div>
                   </div>
@@ -243,22 +233,112 @@ export default function CarDetailPage() {
 
                   {/* Info */}
                   <div className="text-xs text-muted-foreground space-y-1">
-                    <p>✓ {siteConfig.booking.freeCancellation}</p>
-                    <p>✓ {siteConfig.booking.support}</p>
-                    <p>✓ {siteConfig.booking.insurance}</p>
+                    <p>✓ 5 Years International Warranty</p>
+                    <p>✓ Free Insured Global Delivery</p>
+                    <p>✓ Certificate of Authenticity Included</p>
                   </div>
 
                   {/* Action CTA */}
                   {siteConfig.template.mode === "shopping" ? (
-                    <Button
-                      asChild
-                      className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg gap-2"
-                    >
-                      <Link href="/cart">
-                        <ShoppingCart className="w-5 h-5" />
-                        {siteConfig.taxonomy.addToCartLabel}
-                      </Link>
-                    </Button>
+                    <div className="space-y-4 pt-4 border-t border-border">
+                      {/* Quantity Picker */}
+                      <div className="space-y-2">
+                        <label className="text-sm font-semibold text-foreground block">
+                          Quantity
+                        </label>
+                        {isInCart(id) ? (
+                          <div className="flex items-center gap-3">
+                            <button
+                              onClick={() => {
+                                const newQty = getQuantity(id) - 1;
+                                if (newQty < 1) return;
+                                updateQuantity(id, newQty);
+                              }}
+                              disabled={getQuantity(id) <= quantityCfg.min}
+                              className="w-10 h-10 rounded-lg border border-border bg-secondary hover:bg-muted flex items-center justify-center text-lg font-bold disabled:opacity-40 transition-colors"
+                            >
+                              −
+                            </button>
+                            <span className="text-xl font-bold text-foreground w-8 text-center">
+                              {getQuantity(id)}
+                            </span>
+                            <button
+                              onClick={() => {
+                                const newQty = getQuantity(id) + 1;
+                                if (newQty > quantityCfg.max) return;
+                                updateQuantity(id, newQty);
+                              }}
+                              disabled={getQuantity(id) >= quantityCfg.max}
+                              className="w-10 h-10 rounded-lg border border-border bg-secondary hover:bg-muted flex items-center justify-center text-lg font-bold disabled:opacity-40 transition-colors"
+                            >
+                               +
+                            </button>
+                          </div>
+                        ) : (
+                          <select
+                            value={selectedQty}
+                            onChange={(e) => setSelectedQty(Number(e.target.value))}
+                            className="w-full px-3 py-2.5 bg-input border border-border rounded-lg text-foreground focus:outline-none focus:ring-2 focus:ring-primary/50 text-sm font-medium"
+                          >
+                            {Array.from(
+                              { length: quantityCfg.max - quantityCfg.min + 1 },
+                              (_, i) => quantityCfg.min + i
+                            ).map((qty) => (
+                              <option key={qty} value={qty}>{qty}</option>
+                            ))}
+                          </select>
+                        )}
+                      </div>
+
+                      {/* Subtotal */}
+                      <div className="flex justify-between text-sm py-2">
+                        <span className="text-muted-foreground">
+                          {isInCart(id) ? getQuantity(id) : selectedQty} × {formatPrice(car.price || car.pricePerHour || 0)}
+                        </span>
+                        <span className="font-semibold text-foreground">
+                          {formatPrice((car.price || car.pricePerHour || 0) * (isInCart(id) ? getQuantity(id) : selectedQty))}
+                        </span>
+                      </div>
+
+                      {isInCart(id) ? (
+                        <>
+                          <Button
+                            onClick={() => router.push("/cart")}
+                            className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg flex items-center gap-2"
+                          >
+                            <ShoppingCart className="w-5 h-5" />
+                            View Cart
+                          </Button>
+                          <p className="text-xs text-green-500 text-center bg-green-500/10 p-2 rounded border border-green-500/20 flex items-center justify-center gap-1">
+                            <CheckCircle className="w-3.5 h-3.5" />
+                            Item is in your cart
+                          </p>
+                        </>
+                      ) : (
+                        <Button
+                          onClick={() => {
+                            addItem({
+                              id: String(car.id || car._id),
+                              name: car.name,
+                              image: car.image,
+                              price: car.price || car.pricePerHour || 0,
+                              priceDisplay: formatPrice(car.price || car.pricePerHour || 0),
+                              priceSuffix: siteConfig.taxonomy.priceSuffix,
+                              category: car.category,
+                            }, selectedQty);
+                            setCartAdded(true);
+                            toast({
+                              title: "Added to cart!",
+                              description: `${selectedQty}× ${car.name} added to your ${siteConfig.taxonomy.cartLabel}.`,
+                            });
+                          }}
+                          className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg gap-2"
+                        >
+                          <ShoppingCart className="w-5 h-5" />
+                          {siteConfig.taxonomy.addToCartLabel}
+                        </Button>
+                      )}
+                    </div>
                   ) : (
                     <Button
                       asChild

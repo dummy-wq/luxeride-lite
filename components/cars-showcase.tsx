@@ -26,13 +26,15 @@ import {
 } from "lucide-react";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Slider } from "@/components/ui/slider";
-import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRouter } from "next/navigation";
 import { useAuth } from "@/lib/context/auth-context";
 import { siteConfig } from "@/template/config";
 import { formatPrice } from "@/lib/utils";
-import { ShoppingCart, CheckCircle } from "lucide-react";
+import { ShoppingCart, CheckCircle, Plus, Minus } from "lucide-react";
+
+import { useToast } from "@/hooks/use-toast";
+import { useCart } from "@/lib/context/cart-context";
 
 // Icon mapping for dynamic specs
 const IconMap: Record<string, any> = {
@@ -46,17 +48,34 @@ import { cars, carsDatabase } from "@/template/catalog";
 export function CarsShowcase() {
   const router = useRouter();
   const { user } = useAuth();
+  const { toast } = useToast();
+  const { addItem, isInCart, getQuantity, updateQuantity } = useCart();
 
   const [selectedCategory, setSelectedCategory] = useState("all");
   const [favorites, setFavorites] = useState<number[]>([]);
   const [cityHash, setCityHash] = useState(0);
   const [searchQuery, setSearchQuery] = useState("");
   const [isLoading, setIsLoading] = useState(true);
-  const [selectedCarId, setSelectedCarId] = useState<string | null>(null);
   const [carsList, setCarsList] = useState<any[]>([]);
   const quantityCfg = siteConfig.template.quantity;
   const [selectedQty, setSelectedQty] = useState<number>(quantityCfg.default);
   const isShoppingMode = siteConfig.template.mode === "shopping";
+
+  const handleAddToCart = (car: any) => {
+    addItem({
+      id: String(car._id || car.id),
+      name: car.name,
+      image: car.image || "",
+      price: car.price || car.pricePerHour || 0,
+      priceDisplay: formatPrice(car.price || car.pricePerHour || 0),
+      priceSuffix: siteConfig.taxonomy.priceSuffix,
+      category: car.category,
+    });
+    toast({
+      title: isInCart(String(car._id || car.id)) ? "Quantity Updated" : "Added to Cart",
+      description: `${car.name} is in your cart.`,
+    });
+  };
 
   // Fetch cars from API
   useEffect(() => {
@@ -129,32 +148,7 @@ export function CarsShowcase() {
     }
   }, []);
 
-  // Pre-fill user profile fields when detail opens
-  useEffect(() => {
-    if (user && selectedCarId) {
-      // no-op: simplified detail panel no longer pre-fills form fields
-    }
-  }, [user, selectedCarId]);
-
   // Handle Incremental Navigation (URL ?car=id sync)
-  useEffect(() => {
-    const handlePopState = () => {
-      const params = new URLSearchParams(window.location.search);
-      const carId = params.get("car");
-      if (carId && carsDatabase[carId as keyof typeof carsDatabase]) {
-        setSelectedCarId(carId);
-      } else {
-        setSelectedCarId(null);
-      }
-    };
-
-    // Initialize from URL on mount
-    handlePopState();
-
-    window.addEventListener("popstate", handlePopState);
-    return () => window.removeEventListener("popstate", handlePopState);
-  }, []);
-
   // 12-hour time cycle for periodic rotation
   const getCycle = () => Math.floor(Date.now() / (12 * 60 * 60 * 1000));
 
@@ -207,29 +201,6 @@ export function CarsShowcase() {
     });
   }, [selectedCategory, searchQuery, priceRange, carsList]); // Added carsList to dependencies
 
-  // Get detailed car (for the inline detail panel)
-  const selectedCar = useMemo(() => {
-    if (!selectedCarId) return null;
-    const foundInList = carsList.find(c => String(c._id || c.id) === selectedCarId);
-    if (foundInList) return foundInList;
-    return carsDatabase[selectedCarId as keyof typeof carsDatabase];
-  }, [selectedCarId, carsList]);
-
-  // Handle URL syncing for incremental navigation
-  const openCarDetail = (carId: string | null) => {
-    setSelectedCarId(carId);
-    if (carId) setSelectedQty(quantityCfg.default);
-    
-    const url = new URL(window.location.href);
-    if (carId) {
-      url.searchParams.set("car", carId);
-    } else {
-      url.searchParams.delete("car");
-    }
-    // Push state so browser Back button works to close the panel!
-    window.history.pushState({ car: carId }, "", url.toString());
-  };
-
   // ── Booking handler removed — users go to /cars/[id] for booking ──
 
   // ── Card animation variants ──
@@ -252,8 +223,7 @@ export function CarsShowcase() {
           </p>
         </div>
 
-        {/* Filters Bar — hidden when detail is open */}
-        {!selectedCarId && (
+
           <div className="flex flex-col gap-6 mb-12">
             {/* Category + Search Row */}
             <div className="flex flex-col md:flex-row gap-6 items-center justify-between">
@@ -305,201 +275,11 @@ export function CarsShowcase() {
               </span>
             </div>
           </div>
-        )}
-
-        {/* ── Inline Detail Panel ── */}
-        <AnimatePresence mode="wait">
-          {selectedCar && selectedCarId && (
-            <motion.div
-              key={`detail-${selectedCarId}`}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.18, ease: "easeInOut" }}
-              className="mb-12"
-            >
-              <button
-                onClick={() => openCarDetail(null)}
-                className="text-primary hover:text-primary/80 font-semibold mb-6 inline-flex items-center gap-1 transition-colors"
-              >
-                ← Back to All Cars
-              </button>
-
-              <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-                {/* Main Content */}
-                <div className="lg:col-span-2 space-y-6">
-                  {/* Hero Image */}
-                  <Card className="h-96 bg-gradient-to-br from-primary/20 to-accent/20 rounded-2xl border-border overflow-hidden relative">
-                    <Image
-                      src={selectedCar.image}
-                      alt={selectedCar.name}
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  </Card>
-
-                  {/* Title and Category */}
-                  <div className="space-y-2">
-                    <div className="inline-block px-3 py-1 bg-primary/10 rounded-full text-sm font-semibold text-primary">
-                      {selectedCar.category}
-                    </div>
-                    <h1 className="text-4xl font-bold text-foreground">
-                      {selectedCar.name}
-                    </h1>
-                    <p className="text-lg text-muted-foreground">
-                      Model {selectedCar.model}
-                    </p>
-                  </div>
-
-                  {/* Quick Specs - Dynamic from metadataSchema */}
-                  <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                    {siteConfig.metadataSchema.map((spec) => {
-                      const Icon = IconMap[spec.icon] || Info;
-                      return (
-                        <Card key={spec.key} className="p-4 bg-card border-border text-center">
-                          <Icon className="w-5 h-5 text-primary mx-auto mb-2" />
-                          <p className="text-sm text-muted-foreground">{spec.label}</p>
-                          <p className="font-bold text-foreground">
-                            {selectedCar[spec.key] || "N/A"}
-                          </p>
-                        </Card>
-                      );
-                    })}
-                  </div>
-
-                  {/* Performance Specs */}
-                  <Card className="p-6 bg-card border-border space-y-4">
-                    <h3 className="text-xl font-bold text-foreground">
-                      Performance
-                    </h3>
-                    <div className="grid grid-cols-2 gap-6">
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Engine
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          {selectedCar.engine}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Power
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          {selectedCar.power}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Torque
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          {selectedCar.torque}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          0-100 km/h
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          {selectedCar.acceleration}
-                        </p>
-                      </div>
-                      <div>
-                        <p className="text-sm text-muted-foreground mb-1">
-                          Top Speed
-                        </p>
-                        <p className="font-semibold text-foreground">
-                          {selectedCar.topSpeed}
-                        </p>
-                      </div>
-                    </div>
-                  </Card>
-
-                  {/* Features */}
-                  <Card className="p-6 bg-card border-border space-y-4">
-                    <h3 className="text-xl font-bold text-foreground">
-                      Key Features
-                    </h3>
-                    <div className="grid grid-cols-2 gap-3">
-                      {selectedCar.features?.map(
-                        (feature: string, index: number) => (
-                          <div key={index} className="flex items-center gap-2">
-                            <div className="w-2 h-2 bg-primary rounded-full" />
-                            <span className="text-foreground">{feature}</span>
-                          </div>
-                        ),
-                      )}
-                    </div>
-                  </Card>
-
-                  {/* Policies */}
-                  {siteConfig.template.mode === "service" && (
-                    <Card className="p-6 bg-card border-border space-y-4">
-                      <h3 className="text-xl font-bold text-foreground">
-                        Terms & Conditions
-                      </h3>
-                      <div className="space-y-3">
-                        <div className="flex gap-3 items-start">
-                          <Shield className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                          <div>
-                            <p className="font-semibold text-foreground">
-                              Insurance
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedCar.insurance || "Standard Coverage"}
-                            </p>
-                          </div>
-                        </div>
-                        <div className="flex gap-3 items-start">
-                          <Zap className="w-5 h-5 text-primary flex-shrink-0 mt-1" />
-                          <div>
-                            <p className="font-semibold text-foreground">
-                              Cancellation
-                            </p>
-                            <p className="text-sm text-muted-foreground">
-                              {selectedCar.cancellation || "Free within 24h"}
-                            </p>
-                          </div>
-                        </div>
-                      </div>
-                    </Card>
-                  )}
-                </div>
 
 
-                {/* ── Sidebar (Pricing) ── */}
-                <div className="lg:col-span-1">
-                  <div className="sticky top-24">
-                    <Card className="p-6 bg-card border-border space-y-6">
-                      <h3 className="text-xl font-bold text-foreground">Quick Summary</h3>
-                      <div className="space-y-2">
-                        <p className="text-sm text-muted-foreground">Starting from</p>
-                        <div className="flex items-baseline gap-2">
-                          <span className="text-4xl font-bold text-primary">{formatPrice(selectedCar.price)}</span>
-                          <span className="text-sm text-muted-foreground">{siteConfig.taxonomy.priceSuffix}</span>
-                        </div>
-                      </div>
-                      <div className="text-xs text-muted-foreground space-y-1">
-                        <p>✓ {siteConfig.booking.freeCancellation}</p>
-                        <p>✓ {siteConfig.booking.support}</p>
-                        <p>✓ {siteConfig.booking.insurance}</p>
-                      </div>
-                      <Button onClick={() => router.push(`/cars/${selectedCarId}`)} className="w-full bg-primary hover:bg-primary/90 text-primary-foreground py-6 font-semibold text-lg transition-all active:scale-[0.98]">
-                        {siteConfig.taxonomy.actionLabel}
-                      </Button>
-                    </Card>
-                  </div>
-                </div>
-              </div>
-            </motion.div>
-          )}
-        </AnimatePresence>
 
         {/* ── Cars Grid ── */}
-        {!selectedCarId && (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[400px]">
+  <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6 min-h-[400px]">
             <AnimatePresence mode="popLayout">
               {isLoading
                 ? Array.from({ length: 8 }).map((_, i) => (
@@ -557,16 +337,20 @@ export function CarsShowcase() {
                               {siteConfig.template.showAvailability ? availability : siteConfig.taxonomy.itemLabelSingular}
                             </div>
 
-                            {/* Car Image */}
-                            <div className="relative h-48 bg-gradient-to-br from-primary/20 to-accent/20 overflow-hidden group">
-                              <div className="absolute inset-0 transition-transform duration-300 ease-out group-hover:scale-105">
-                                <Image
+                            {/* Product Image */}
+                            <div className="relative h-48 bg-muted overflow-hidden group">
+                              {car.image ? (
+                                <img
                                   src={car.image}
                                   alt={car.name}
-                                  fill
-                                  className="object-cover"
+                                  className="w-full h-full object-cover object-center transition-transform duration-500 group-hover:scale-105"
                                 />
-                              </div>
+                              ) : (
+                                <Skeleton
+                                  className="absolute inset-0 w-full h-full"
+                                  style={{ animationDuration: "8s" }}
+                                />
+                              )}
                               {shaded && (
                                 <div className="absolute inset-0 bg-black/40 backdrop-blur-[2px] flex items-center justify-center z-10">
                                   <span className="text-white font-black text-xs uppercase tracking-tighter border-2 border-white/50 px-3 py-1 rotate-12">
@@ -625,15 +409,39 @@ export function CarsShowcase() {
                               {/* CTA */}
                               <div className="flex flex-col gap-2">
                                 {!shaded ? (
-<Button
-                                    onClick={() => openCarDetail(carId)}
-                                    className="w-full bg-primary hover:bg-primary/90 text-primary-foreground transition-all duration-100 ease-out"
-                                  >
-                                    {siteConfig.taxonomy.actionLabel}
-                                  </Button>
-) : (
-<Button disabled className="w-full bg-muted text-muted-foreground cursor-not-allowed">Unavailable</Button>
-)}
+                                  isInCart(carId) ? (
+                                    <div className="flex items-center justify-between bg-green-50/50 border border-green-200 dark:bg-green-950/30 dark:border-green-900 rounded-md p-1 h-10">
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 text-green-700 hover:text-green-800 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
+                                        onClick={() => updateQuantity(carId, getQuantity(carId) - 1)}
+                                      >
+                                        <Minus className="w-4 h-4" />
+                                      </Button>
+                                      <span className="font-semibold text-green-800 dark:text-green-400 w-8 text-center">
+                                        {getQuantity(carId)}
+                                      </span>
+                                      <Button
+                                        size="icon"
+                                        variant="ghost"
+                                        className="h-8 w-8 text-green-700 hover:text-green-800 hover:bg-green-100 dark:text-green-400 dark:hover:text-green-300 dark:hover:bg-green-900/50"
+                                        onClick={() => updateQuantity(carId, getQuantity(carId) + 1)}
+                                      >
+                                        <Plus className="w-4 h-4" />
+                                      </Button>
+                                    </div>
+                                  ) : (
+                                    <Button
+                                      onClick={() => handleAddToCart(car)}
+                                      className="w-full transition-all duration-100 ease-out bg-primary hover:bg-primary/90 text-primary-foreground h-10"
+                                    >
+                                      <span className="flex items-center gap-2"><ShoppingCart className="w-4 h-4" /> Add to Cart</span>
+                                    </Button>
+                                  )
+                                ) : (
+                                  <Button disabled className="w-full h-10 bg-muted text-muted-foreground cursor-not-allowed">Unavailable</Button>
+                                )}
                               </div>
                             </div>
                           </Card>
@@ -643,35 +451,8 @@ export function CarsShowcase() {
                   : null}
             </AnimatePresence>
 
-            {/* No results */}
-            {!isLoading && filteredCars.length === 0 && (
-              <div className="col-span-full py-20 text-center space-y-4 bg-muted/20 rounded-2xl border border-dashed border-border">
-                <Search className="w-10 h-10 text-muted-foreground mx-auto opacity-20" />
-                <div className="space-y-1">
-                  <p className="text-xl font-bold text-foreground">
-                    {carsPage.noResultsTitle}
-                  </p>
-                  <p className="text-muted-foreground">
-                    {carsPage.noResultsSubtitle}
-                  </p>
-                </div>
-                <Button
-                  variant="outline"
-                  onClick={() => {
-                    setSearchQuery("");
-                    setSelectedCategory("all");
-                    setPriceRange([minPrice, maxPrice]);
-                  }}
-                >
-                  Clear all filters
-                </Button>
-              </div>
-            )}
           </div>
-        )}
 
-        {/* Stats Section */}
-        {!selectedCarId && (
           <div className="mt-20 grid grid-cols-1 md:grid-cols-3 gap-8 pt-12 border-t border-border">
             {carsPage.stats.map((stat, index) => (
               <div key={index} className="text-center space-y-2">
@@ -682,8 +463,7 @@ export function CarsShowcase() {
               </div>
             ))}
           </div>
-        )}
-      </div>
+        </div>
     </section>
   );
 }

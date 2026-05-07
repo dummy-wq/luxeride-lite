@@ -9,12 +9,14 @@ import { Button } from "@/components/ui/button";
 import Image from "next/image";
 
 import { useAuth } from "@/lib/context/auth-context";
+import { useCart } from "@/lib/context/cart-context";
 import { siteConfig } from "@/template/config";
 
 export function Navigation() {
   const { theme, setTheme } = useTheme();
   const [isOpen, setIsOpen] = useState(false);
   const { user, logout } = useAuth();
+  const { totalItems } = useCart();
   const pathname = usePathname();
 
   const handleLogout = async () => {
@@ -131,12 +133,17 @@ export function Navigation() {
             <Button
               variant="ghost"
               size="icon"
-              className="text-foreground"
+              className="text-foreground relative"
               title="Cart"
               asChild
             >
               <Link href="/cart">
                 <ShoppingCart className="w-5 h-5" />
+                {totalItems > 0 && (
+                  <span className="absolute -top-1 -right-1 bg-primary text-primary-foreground text-[10px] font-black leading-none w-4 h-4 rounded-full flex items-center justify-center">
+                    {totalItems > 9 ? "9+" : totalItems}
+                  </span>
+                )}
               </Link>
             </Button>
             {user ? (

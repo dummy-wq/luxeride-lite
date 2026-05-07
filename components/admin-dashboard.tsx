@@ -46,8 +46,27 @@ export function AdminDashboard() {
     const [isLoading, setIsLoading] = useState(true);
     const [error, setError] = useState<string | null>(null);
     const [searchTerm, setSearchTerm] = useState("");
-    const [activeTab, setActiveTab] = useState<"users" | "catalog">("users");
+    const [activeTab, setActiveTab] = useState<"users" | "catalog" | "orders">("users");
     const router = useRouter();
+
+    // ── Mock Orders ────────────────────────────────────────────────────────────
+    const mockOrders = [
+      { id: "ORD-8841", customer: "Arjun Patel",     item: "Luxe Vacheron Chrono", qty: 1, total: 17700,  status: "Delivered",  date: "Apr 26, 2026" },
+      { id: "ORD-8840", customer: "Priya Sharma",    item: "V&C Geneve Noir",      qty: 1, total: 25960,  status: "Processing", date: "Apr 26, 2026" },
+      { id: "ORD-8839", customer: "Rohit Verma",     item: "Aethelred Classic",    qty: 2, total: 20060,  status: "Delivered",  date: "Apr 25, 2026" },
+      { id: "ORD-8837", customer: "Sneha Iyer",      item: "Titanium Deep Sea",   qty: 1, total: 14160,  status: "Shipped",    date: "Apr 25, 2026" },
+      { id: "ORD-8835", customer: "Karan Malhotra",  item: "Luxe Vacheron Chrono",qty: 1, total: 17700,  status: "Delivered",  date: "Apr 24, 2026" },
+      { id: "ORD-8833", customer: "Anjali Nair",     item: "V&C Geneve Noir",     qty: 2, total: 51920,  status: "Delivered",  date: "Apr 23, 2026" },
+      { id: "ORD-8830", customer: "Dev Mehta",       item: "Aethelred Classic",   qty: 1, total: 10030,  status: "Cancelled",  date: "Apr 22, 2026" },
+      { id: "ORD-8828", customer: "Riya Kapoor",     item: "Titanium Deep Sea",   qty: 1, total: 14160,  status: "Shipped",    date: "Apr 22, 2026" },
+    ];
+    const orderRevenue = mockOrders.filter(o => o.status !== "Cancelled").reduce((s, o) => s + o.total, 0);
+    const statusColor: Record<string, string> = {
+      Delivered:  "bg-green-500/10  text-green-500  border-green-500/20",
+      Shipped:    "bg-blue-500/10   text-blue-500   border-blue-500/20",
+      Processing: "bg-yellow-500/10 text-yellow-500 border-yellow-500/20",
+      Cancelled:  "bg-red-500/10    text-red-500    border-red-500/20",
+    };
 
     const fetchUsers = async () => {
         try {
@@ -138,8 +157,9 @@ export function AdminDashboard() {
     }
 
     const tabHeadings: Record<typeof activeTab, { title: string; subtitle: string }> = {
-        users:     { title: "User Management",    subtitle: `Monitor and manage all ${siteConfig.brand.name} members` },
-        catalog:   { title: "Catalog Management", subtitle: `Manage your ${siteConfig.taxonomy.itemLabelPlural.toLowerCase()} inventory and pricing` },
+        users:   { title: "User Management",    subtitle: `Monitor and manage all ${siteConfig.brand.name} members` },
+        catalog: { title: "Catalog Management", subtitle: `Manage your ${siteConfig.taxonomy.itemLabelPlural.toLowerCase()} inventory and pricing` },
+        orders:  { title: "Orders",              subtitle: "View and manage all customer orders" },
     };
 
     return (
@@ -160,15 +180,16 @@ export function AdminDashboard() {
 
                     {/* Tab switcher */}
                     <div className="flex items-center gap-1.5 bg-secondary/50 p-1.5 rounded-2xl border border-border flex-wrap">
-                        {(["users", "catalog"] as const).map((tab) => (
+                    {(["users", "catalog", "orders"] as const).map((tab) => (
                             <Button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
                                 variant={activeTab === tab ? "default" : "ghost"}
                                 className={`rounded-xl gap-2 capitalize ${activeTab === tab ? "shadow-lg" : ""}`}
                             >
-                                {tab === "users"   && <Users   className="w-4 h-4" />}
-                                {tab === "catalog" && <Package className="w-4 h-4" />}
+                                {tab === "users"   && <Users       className="w-4 h-4" />}
+                                {tab === "catalog" && <Package     className="w-4 h-4" />}
+                                {tab === "orders"  && <ShoppingCart className="w-4 h-4" />}
                                 {tab.charAt(0).toUpperCase() + tab.slice(1)}
                             </Button>
                         ))}
@@ -320,6 +341,93 @@ export function AdminDashboard() {
                 )}
 
                 {activeTab === "catalog" && <FleetManager />}
+
+                {activeTab === "orders" && (
+                    <>
+                        {/* Revenue Stats */}
+                        <div className="grid grid-cols-1 md:grid-cols-4 gap-6 mb-10">
+                            <Card className="p-6 bg-card border-border shadow-md hover:shadow-lg transition-shadow">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-primary/10 rounded-xl"><ShoppingCart className="w-6 h-6 text-primary" /></div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Total Orders</p>
+                                        <p className="text-3xl font-black text-foreground">{mockOrders.length}</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="p-6 bg-card border-border shadow-md hover:shadow-lg transition-shadow">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-green-500/10 rounded-xl"><Package className="w-6 h-6 text-green-500" /></div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Revenue</p>
+                                        <p className="text-3xl font-black text-foreground">₹{(orderRevenue/1000).toFixed(0)}K</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="p-6 bg-card border-border shadow-md hover:shadow-lg transition-shadow">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-blue-500/10 rounded-xl"><CalendarRange className="w-6 h-6 text-blue-500" /></div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">This Week</p>
+                                        <p className="text-3xl font-black text-foreground">{mockOrders.filter(o => o.date.includes("Apr 2")).length}</p>
+                                    </div>
+                                </div>
+                            </Card>
+                            <Card className="p-6 bg-card border-border shadow-md hover:shadow-lg transition-shadow">
+                                <div className="flex items-center gap-4">
+                                    <div className="p-3 bg-yellow-500/10 rounded-xl"><Clock className="w-6 h-6 text-yellow-500" /></div>
+                                    <div>
+                                        <p className="text-sm text-muted-foreground font-medium uppercase tracking-wider">Pending</p>
+                                        <p className="text-3xl font-black text-foreground">{mockOrders.filter(o => o.status === "Processing" || o.status === "Shipped").length}</p>
+                                    </div>
+                                </div>
+                            </Card>
+                        </div>
+
+                        {/* Orders Table */}
+                        <Card className="bg-card border-border shadow-xl overflow-hidden rounded-2xl">
+                            <div className="overflow-x-auto">
+                                <table className="w-full text-left">
+                                    <thead>
+                                        <tr className="bg-secondary/50 border-b border-border">
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Order ID</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Customer</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Item</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Qty</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Total</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Status</th>
+                                            <th className="px-6 py-4 text-xs font-bold text-muted-foreground uppercase tracking-widest">Date</th>
+                                        </tr>
+                                    </thead>
+                                    <tbody className="divide-y divide-border">
+                                        {mockOrders.map((order) => (
+                                            <tr key={order.id} className="hover:bg-secondary/20 transition-colors">
+                                                <td className="px-6 py-5 font-mono text-sm text-primary font-bold">{order.id}</td>
+                                                <td className="px-6 py-5">
+                                                    <div className="flex items-center gap-3">
+                                                        <div className="w-8 h-8 rounded-full bg-primary/20 flex items-center justify-center text-primary font-bold text-sm select-none">
+                                                            {order.customer[0]}
+                                                        </div>
+                                                        <span className="font-semibold text-foreground">{order.customer}</span>
+                                                    </div>
+                                                </td>
+                                                <td className="px-6 py-5 text-foreground font-medium">{order.item}</td>
+                                                <td className="px-6 py-5 text-foreground">{order.qty}</td>
+                                                <td className="px-6 py-5 font-bold text-foreground">₹{order.total.toLocaleString()}</td>
+                                                <td className="px-6 py-5">
+                                                    <span className={`px-2 py-1 text-[10px] font-bold uppercase tracking-wider rounded border ${statusColor[order.status]}`}>
+                                                        {order.status}
+                                                    </span>
+                                                </td>
+                                                <td className="px-6 py-5 text-sm text-muted-foreground">{order.date}</td>
+                                            </tr>
+                                        ))}
+                                    </tbody>
+                                </table>
+                            </div>
+                        </Card>
+                    </>
+                )}
 
                 {/* Footer */}
                 <div className="mt-8 flex items-center justify-between text-sm text-muted-foreground">
